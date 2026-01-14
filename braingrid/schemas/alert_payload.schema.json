@@ -2,42 +2,20 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CookedPilotAlertPayload",
   "type": "object",
-  "required": [
-    "id",
-    "created_at",
-    "alert_type",
-    "severity",
-    "ui"
-  ],
+  "required": ["id","created_at","alert_type","severity","ui"],
   "properties": {
     "id": { "type": "string" },
     "created_at": { "type": "string" },
     "source": { "type": "string" },
     "location_context": { "type": "string" },
-
-    "alert_type": {
-      "type": "string",
-      "enum": ["bad_batch", "contamination", "overdose_spike", "heat_risk", "unknown"]
-    },
+    "alert_type": { "type": "string", "enum": ["bad_batch","contamination","overdose_spike","heat_risk","unknown"] },
     "substance": { "type": "string" },
-    "severity": {
-      "type": "string",
-      "enum": ["low", "medium", "high", "critical"]
-    },
-
+    "severity": { "type": "string", "enum": ["low","medium","high","critical"] },
     "ui": {
       "type": "object",
       "required": [
-        "alert_title",
-        "alert_subtitle",
-        "severity_label",
-        "severity_color",
-        "severity_icon",
-        "risk_summary",
-        "do_now_bullets",
-        "triage_recommendation",
-        "notification_title",
-        "notification_body"
+        "alert_title","alert_subtitle","severity_label","severity_color","severity_icon",
+        "risk_summary","do_now_bullets","triage_recommendation","notification_title","notification_body"
       ],
       "properties": {
         "alert_title": { "type": "string" },
@@ -45,15 +23,9 @@
         "severity_label": { "type": "string" },
         "severity_color": { "type": "string" },
         "severity_icon": { "type": "string" },
-
         "risk_summary": { "type": "string" },
-        "do_now_bullets": {
-          "type": "array",
-          "minItems": 3,
-          "items": { "type": "string" }
-        },
+        "do_now_bullets": { "type": "array", "minItems": 3, "items": { "type": "string" } },
         "triage_recommendation": { "type": "string" },
-
         "notification_title": { "type": "string" },
         "notification_body": { "type": "string" }
       }
