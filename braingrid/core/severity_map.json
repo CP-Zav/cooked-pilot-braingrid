@@ -1,0 +1,79 @@
+{
+  "low": {
+    "label": "LOW",
+    "color": "#2ECC71",
+    "icon": "info",
+    "escalation_level": "monitor",
+    "description": "General awareness. No immediate danger if precautions are taken."
+  },
+  "medium": {
+    "label": "MEDIUM",
+    "color": "#F1C40F",
+    "icon": "alert",
+    "escalation_level": "caution",
+    "description": "I
+
+cat > braingrid/workflows/alert_triage_and_guidance.json <<'EOF'
+{
+  "id": "workflow.alert.triage.guidance",
+  "name": "Alert Triage and Harm Reduction Guidance",
+  "version": "1.2.0",
+  "inputs": [
+    { "key": "alert_type", "type": "string" },
+    { "key": "substance", "type": "string" },
+    { "key": "severity", "type": "string" },
+    { "key": "location_context", "type": "string" }
+  ],
+  "steps": [
+    {
+      "id": "severity_mapping",
+      "action": "Map severity to canonical UI semantics using core severity map",
+      "checks": [
+        "severity in [low, medium, high, critical]"
+      ],
+      "produces": [
+        "severity_label",
+        "severity_color",
+        "severity_icon",
+        "escalation_level"
+      ]
+    },
+    {
+      "id": "risk_interpretation",
+      "action": "Interpret risk based on alert type and severity",
+      "produces": ["risk_summary"]
+    },
+    {
+      "id": "guidance_generation",
+      "action": "Generate harm reduction guidance as bullet points",
+      "produces": ["do_now_bullets"]
+    },
+    {
+      "id": "triage_decision",
+      "action": "Generate escalation guidance based on escalation level",
+      "produces": ["triage_recommendation"]
+    },
+    {
+      "id": "ui_copy_assembly",
+      "action": "Assemble UI and notification copy",
+      "produces": [
+        "alert_title",
+        "alert_subtitle",
+        "notification_title",
+        "notification_body"
+      ]
+    }
+  ],
+  "outputs": [
+    { "key": "alert_title", "type": "string" },
+    { "key": "alert_subtitle", "type": "string" },
+    { "key": "severity_label", "type": "string" },
+    { "key": "severity_color", "type": "string" },
+    { "key": "severity_icon", "type": "string" },
+    { "key": "risk_summary", "type": "string" },
+    { "key": "do_now_bullets", "type": "array", "items": { "type": "string" } },
+    { "key": "triage_recommendation", "type": "string" },
+    { "key": "notification_title", "type": "string" },
+    { "key": "notification_body", "type": "string" }
+  ]
+}
