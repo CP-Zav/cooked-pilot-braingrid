@@ -1,7 +1,7 @@
 {
   "id": "workflow.panic.stabilize.escalate",
   "name": "Panic Mode: Stabilize and Escalate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "inputs": [
     { "key": "user_state", "type": "string", "description": "anxious, panicking, confused, overheated, unwell, other" },
     { "key": "symptoms", "type": "array", "description": "symptom keywords", "items": { "type": "string" } },
@@ -15,136 +15,79 @@
       "checks": [
         "severity in [low, medium, high, critical]"
       ],
-
-cat > braingrid/core/panic_renderer_contract.md <<'EOF'
-# Cooked Pilot – Panic Mode Renderer Contract (v1)
-
-Panic Mode is a stabilization + escalation UI. It must feel calm, minimal, and directive.
-
----
-
-## Canonical Pattern (same bones)
-1. WHAT
-2. RISK
-3. DO NOW
-4. GET HELP
-
----
-
-## Component: Panic Mode Full Screen
-
-### WHAT
-- panic_title
-- panic_subtitle (include location_context if available)
-
-### RISK
-- risk_summary (max 2 sentences)
-
-### DO NOW
-- Render stabilize_steps as a numbered list (max 5 visible steps)
-- Also render do_now_bullets (max 3) as quick actions underneath
-
-### GET HELP
-- R
-
-cat > braingrid/core/panic_renderer_contract.md <<'EOF'
-# Cooked Pilot – Panic Mode Renderer Contract (v1)
-
-Panic Mode is a stabilization + escalation UI. It must feel calm, minimal, and directive.
-
----
-
-## Canonical Pattern (same bones)
-1. WHAT
-2. RISK
-3. DO NOW
-4. GET HELP
-
----
-
-## Component: Panic Mode Full Screen
-
-### WHAT
-- panic_title
-- panic_subtitle (include location_context if available)
-
-### RISK
-- risk_summary (max 2 sentences)
-
-### DO NOW
-- Render stabilize_steps as a numbered list (max 5 visible steps)
-- Also render do_now_bullets (max 3) as quick actions underneath
-
-### GET HELP
-- Render triage_recommendation
-- Render get_help_steps (max 3)
-- Always include red-flag line:
-  “If unconscious, seizing, chest pain, or not breathing — call emergency services now.”
-
----
-
-## Interaction Rules
-- Single-tap big buttons only (no tiny links)
-- No scrolling required to reach GET HELP
-- Respect reduce motion setting (motion_rules.global.reduce_motion_respect = true)
-- Never use shaking/flashing animations
-- Keep language non-judgmental,
-
-git add braingrid/workflows/panic_mode_stabilize_and_escalate.json braingrid/core/panic_renderer_contract.md braingrid/memory/sample_panic_payloads.json
-git commit -m "Add Panic Mode workflow, renderer contract, and sample payloads"
-git push
-
-cat > braingrid/core/panic_buttons_spec.json <<'EOF'
-{
-  "version": "1.0.0",
-  "principles": [
-    "One tap = one action",
-    "No tiny links",
-    "No scrolling required to reach help actions",
-    "Respect reduce motion",
-    "Avoid surveillance language"
-  ],
-  "primary_buttons": [
-    {
-      "id": "btn_find_medical",
-      "label": "Find medical",
-      "icon": "lifebuoy",
-      "action": "open_map_to_nearest_medical_or_first_aid",
-      "visibility_rule": "always"
+      "produces": [
+        "severity_label",
+        "severity_color",
+        "severity_icon",
+        "escalation_level"
+      ]
     },
     {
-      "id": "btn_call_emergency",
-      "label": "Call emergency",
-      "icon": "phone_sos",
-      "action": "initiate_phone_call_emergency_number",
-      "visibility_rule": "visible_if_red_flags_detected_or_severity_critical"
-    }
-  ],
-  "secondary_buttons": [
-    {
-      "id": "btn_message_buddy",
-      "label": "Message buddy",
-      "icon": "share",
-      "action": "send_precomposed_message_to_selected_contact",
-      "visibility_rule": "always"
+      "id": "red_flag_check",
+      "action": "Check symptoms against core/red_flags.json; if any present then escalation_level = emergency and red_flags_detected = true",
+      "checks": [
+        "core/red_flags.json is canonical",
+        "If any red flag is present -> escalation_level must be emergency"
+      ],
+      "produces": [
+        "red_flags_detected",
+        "escalation_directive"
+      ]
     },
     {
-      "id": "btn_show_exit_route",
-      "label": "Show exit route",
-      "icon": "map_pin",
-      "action": "open_map_to_nearest_exit_or_quiet_zone",
-      "visibility_rule": "always"
+      "id": "stabilize_script",
+      "action": "Generate calm, step-by-step stabilize instructions (no surveillance language, no illegal instructions)",
+      "checks": [
+        "Short steps",
+        "Breathing + grounding included",
+        "Cooling and hydration guidance included when relevant",
+        "Encourage buddy support"
+      ],
+      "produces": [
+        "stabilize_steps"
+      ]
+    },
+    {
+      "id": "help_script",
+      "action": "Generate get-help instructions appropriate to escalation level; include emergency instruction from core/red_flags.json",
+      "checks": [
+        "Emergency escalation includes call emergency services guidance",
+        "Medical escalation includes on-site medical guidance"
+      ],
+      "produces": [
+        "get_help_steps",
+        "triage_recommendation"
+      ]
+    },
+    {
+      "id": "ui_copy_assembly",
+      "action": "Assemble Panic Mode UI copy following WHAT/RISK/DO NOW/GET HELP pattern",
+      "produces": [
+        "panic_title",
+        "panic_subtitle",
+        "risk_summary",
+        "do_now_bullets",
+        "notification_title",
+        "notification_body"
+      ]
     }
   ],
-  "precomposed_messages": {
-    "buddy_default": "I’m not okay. Can you come to me now and stay with me? I’m at: {location_context}",
-    "medical_default": "Panic Mode: symptoms include {symptoms}. Location: {location_context}. Please assist."
-  },
-  "ui_rules": {
-    "layout": "2 primary buttons visible without scroll; secondary below",
-    "button_size": "large",
-    "max_buttons_total": 4,
-    "no_confirmation_dialog_for": ["btn_call_emergency"],
-    "confirmation_dialog_for": ["btn_message_buddy"]
-  }
+  "outputs": [
+    { "key": "panic_title", "type": "string" },
+    { "key": "panic_subtitle", "type": "string" },
+
+    { "key": "severity_label", "type": "string" },
+    { "key": "severity_color", "type": "string" },
+    { "key": "severity_icon", "type": "string" },
+    { "key": "red_flags_detected", "type": "boolean" },
+
+    { "key": "risk_summary", "type": "string" },
+    { "key": "stabilize_steps", "type": "array", "items": { "type": "string" } },
+    { "key": "do_now_bullets", "type": "array", "items": { "type": "string" } },
+    { "key": "get_help_steps", "type": "array", "items": { "type": "string" } },
+    { "key": "triage_recommendation", "type": "string" },
+
+    { "key": "notification_title", "type": "string" },
+    { "key": "notification_body", "type": "string" }
+  ]
 }

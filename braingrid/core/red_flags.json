@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "principle": "If any red flag is present, treat as emergency escalation.",
+  "red_flags": [
+    "unconscious",
+    "unresponsive",
+    "not_breathing",
+    "breathing_trouble",
+    "blue_lips",
+    "seizure",
+    "chest_pain",
+    "severe_confusion",
+    "cannot_wake",
+    "collapse",
+    "severe_overheating",
+    "very_high_temp",
+    "repeated_vomiting_with_drowsiness"
+  ],
+  "plain_language_prompts": [
+    "Are they unconscious or hard to wake?",
+    "Are they having trouble breathing or turning blue?",
+    "Are they seizing?",
+    "Do they have chest pain?",
+    "Are they severely confused or collapsing?",
+    "Are they dangerously overheated and not cooling down?"
+  ],
+  "emergency_instruction": "If unconscious, seizing, chest pain, or not breathing — call emergency services now."
+}
