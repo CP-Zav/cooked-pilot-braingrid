@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "principles": [
+    "One tap = one action",
+    "No tiny links",
+    "No scrolling required to reach help actions",
+    "Respect reduce motion",
+    "Avoid surveillance language"
+  ],
+  "primary_buttons": [
+    {
+      "id": "btn_find_medical",
+      "label": "Find medical",
+      "icon": "lifebuoy",
+      "action": "open_map_to_nearest_medical_or_first_aid",
+      "visibility_rule": "always"
+    },
+    {
+      "id": "btn_call_emergency",
+      "label": "Call emergency",
+      "icon": "phone_sos",
+      "action": "initiate_phone_call_emergency_number",
+      "visibility_rule": "visible_if_red_flags_detected_or_severity_critical"
+    }
+  ],
+  "secondary_buttons": [
+    {
+      "id": "btn_message_buddy",
+      "label": "Message buddy",
+      "icon": "share",
+      "action": "send_precomposed_message_to_selected_contact",
+      "visibility_rule": "always"
+    },
+    {
+      "id": "btn_show_exit_route",
+      "label": "Show exit route",
+      "icon": "map_pin",
+      "action": "open_map_to_nearest_exit_or_quiet_zone",
+      "visibility_rule": "always"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "global": {
+    "reduce_motion_respect": true,
+    "max_simultaneous_animations": 2,
+    "animation_style": "calm_signal_not_panic",
+    "notes": [
+      "Never use shaking for alerts; avoid panic amplification.",
+      "Pulse/glow is allowed but bounded.",
+      "Critical should be urgent but readable."
+    ]
+  },
+  "low": {
+    "card": { "glow": "none", "pulse": "none", "border_emphasis": "subtle" },
+    "map_pin": { "pulse": "none", "bounce": "none" },
+    "notif": { "sound": "default", "vibration": "none" }
+
+git add braingrid/core/motion_rules.json
+git commit -m "Add canonical motion rules by severity (calm signal, accessibility first)"
+git push
+
+cat > braingrid/core/icon_map.json <<'EOF'
+{
+  "severity": {
+    "low": "info",
+    "medium": "alert_triangle",
+    "high": "warning_octagon",
+    "critical": "siren"
+  },
+  "alert_type": {
+    "bad_batch": "flask_bad",
+    "contamination": "bioha
+
+cat > braingrid/workflows/alert_triage_and_guidance.json <<'EOF'
+{
+  "id": "workflow.alert.triage.guidance",
+  "name": "Alert Triage and Harm Reduction Guidance",
+  "version": "1.3.0",
+  "inputs": [
+    { "key": "alert_type", "type": "string" },
+    { "key": "substance", "type": "string" },
+    { "key": "severity", "type": "string" },
+    { "key": "location_context", "type": "string" }
+  ],
+  "steps": [
+    {
+      "id": "severity_mapping",
+      "action": "Map severity to canonical UI semantics using core severity map and icon map",
+      "checks": [
+        "severity in [low, medium, high, critical]",
+        "core/severity_map.json is canonical",
+        "core/icon_map.json severity icons are canonical"
+      ],
+      "produces": [
+        "severity_label",
+        "severity_color",
+        "severity_icon",
+        "escalation_level"
+      ]
+    },
+    {
+      "id": "risk_interpretation",
+      "action": "Interpret risk based on alert type and severity",
+      "produces": ["risk_summary"]
+    },
+    {
+      "id": "guidance_generation",
+      "action": "Generate harm reduction guidance as bullet points",
+      "produces": ["do_now_bullets"]
+    },
+    {
+      "id": "triage_decision",
+      "action": "Generate escalation guidance based on escalation level",
+      "produces": ["triage_recommendation"]
+    },
+    {
+      "id": "ui_copy_assembly",
+      "action": "Assemble UI and notification copy",
+      "produces": [
+        "alert_title",
+        "alert_subtitle",
+        "notification_title",
+        "notification_body"
+      ]
+    }
+  ],
+  "outputs": [
+    { "key": "alert_title", "type": "string" },
+    { "key": "alert_subtitle", "type": "string" },
+    { "key": "severity_label", "type": "string" },
+    { "key": "severity_color", "type": "string" },
+    { "key": "severity_icon", "type": "string" },
+    { "key": "risk_summary", "type": "string" },
+    { "key": "do_now_bullets", "type": "array", "items": { "type": "string" } },
+    { "key": "triage_recommendation", "type": "string" },
+    { "key": "notification_title", "type": "string" },
+    { "key": "notification_body", "type": "string" }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "version": "1.0.0",
+  "pattern": ["WHAT", "RISK", "DO_NOW", "GET_HELP"],
+  "components": {
+    "alerts_feed_card": {
+      "fields": {
+        "title": "alert_title",
+        "severity_chip": "severity_label",
+        "severity_color": "severity_color",
+        "severity_icon": "severity_icon",
+        "preview_text": "risk_summary"
+      },
+      "rules": {
+        "preview_max_chars": 120,
+        "avoid_surveillance_language": true
+      }
+    },
+    "alert_detail_view": {
+      "sections": {
+        "WHAT": ["alert_subtitle"],
+        "RISK": ["risk_summary"],
+        "DO_NOW": ["do_now_bullets"],
+        "GET_HELP": ["triage_recommendation"]
+      },
+      "rules": {
+        "do_now_show_max": 3,
+        "always_include_emergency_red_flags": true
+      }
+    },
+    "map_pin": {
+      "fields": {
+        "color": "severity_color",
+        "icon": "severity_icon",
+        "tooltip": "risk_summary"
+      },
+      "rules": {
+        "tooltip_max_chars": 80
+      }
+    },
+    "push_notification": {
+      "fields": {
+        "title": "notification_title",
+        "body": "notification_body"
+      },
+      "rules": {
+        "critica
+
+git add braingrid/core/ui_binding_spec.json
+git commit -m "Add canonical UI binding spec for alerts feed, detail, map pins, and notifications"
+git push
+
+cat > braingrid/schemas/alert_payload.schema.json <<'EOF'
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CookedPilotAlertPayload",
+  "type": "object",
+  "required": [
+    "id",
+    "created_at",
+    "alert_type",
+    "severity",
+    "ui"
+  ],
+  "properties": {
+    "id": { "type": "string", "description": "Unique alert id" },
+    "created_at": { "type": "string", "description": "ISO8601 timestamp" },
+    "source": { "type": "string", "description": "Source
+
+cat > braingrid/memory/sample_alerts.json <<'EOF'
+[
+  {
+    "id": "alert_2026_01_14_0001",
+    "created_at": "2026-01-14T10:15:00+10:00",
+    "source": "Community reports",
+    "location_context": "Near Main Stage / crowd-heavy zone",
+    "alert_type": "heat_risk",
+    "substance": "",
+    "severity": "medium",
+    "ui": {
+      "alert_title": "ALERT: Heat risk advisory",
+      "alert_subtitle": "Heat risk advisory reported near Main Stage / crowd-heavy zone",
+      "severity_label": "MEDIUM",
+      "severity_color": "#F1C40F",
+      "severity_icon": "alert_triangle",
+      "risk_summary": "Crowd density and heat can escalate fast into dangerous overheating, even without substances. Act early to cool down.",
+      "do_now_bullets": [
+        "Move to airflow/shade and cool down before you feel cooked",
+        "Sip water regularly and use electrolytes if sweating heavily",
+        "Buddy-check: hot, confused, dizzy, or cramps = take action now"
+      ],
+      "triage_recommendation": "Monitor closely. Seek on-site medical if confusion, fainting, persistent vomiting, or inability to cool down.",
+      "notification_title": "Heat risk: take a cool-down break",
+      "notification_body": "Crowd + heat can turn dangerous quickly. Move to airflow, hydrate, buddy-check."
+    }
+  },
+  {
+    "id": "alert_2026_01_14_0002",
+    "created_at": "2026-01-14T11:05:00+10:00",
+    "source": "Partner service advisory",
+    "location_context": "Across venue",
+    "alert_type": "contamination",
+    "substance": "MDMA",
+    "severity": "high",
+    "ui": {
+      "alert_title": "ALERT: MDMA contamination warning",
+      "alert_subtitle": "Contamination warning reported across venue",
+      "severity_label": "HIGH",
+      "severity_color": "#E67E22",
+      "severity_icon": "warning_octagon",
+      "risk_summary": "Reports suggest unexpected compounds or unusually strong effects linked to this MDMA. Risk of overdose and medical emergency is higher than normal.",
+      "do_now_bullets": [
+        "Avoid mixing with alcohol or other drugs; keep it simple and safer",
+        "Stay with a trusted friend and monitor each other closely",
+        "If anyone becomes unusually drowsy, confused, overheated, or collapses: get medical help early"
+      ],
+      "triage_recommendation": "High risk: seek on-site medical if symptoms appear or worsen. Call emergency for unconsciousness, seizures, chest pain, or breathing trouble.",
+      "notification_title": "HIGH ALERT: MDMA contamination warning",
+      "notification_body": "Unexpected effects reported. Don’t mix, stay with mates, seek medical early if symptoms hit."
+    }
+  },
+  {
+    "id": "alert_2026_01_14_0003",
+    "created_at": "2026-01-14T12:30:00+10:00",
+    "source": "Multiple incident reports",
+    "location_context": "Multiple stages / widespread",
+    "alert_type": "bad_batch",
+    "substance": "Unknown pills",
+    "severity": "critical",
+    "ui": {
+      "alert_title": "ALERT: Critical bad batch warning",
+      "alert_subtitle": "Bad batch warning reported multiple stages / widespread",
+      "severity_label": "CRITICAL",
+      "severity_color": "#E74C3C",
+      "severity_icon": "siren",
+      "risk_summary": "Multiple serious reactions have been linked to this batch. Risk is high even at typical amounts. Treat as urgent.",
+      "do_now_bullets": [
+        "Do not take this batch; warn friends nearby immediately",
+        "If already taken, avoid alcohol/other drugs and stay monitored with a buddy",
+        "Go to medical now if there’s severe agitation, overheating, repeated vomiting, collapse, or confusion"
+      ],
+      "triage_recommendation": "Critical: go to on-site medical immediately. Call emergency for unconsciousness, seizures, chest pain, or breathing issues.",
+      "notification_title": "CRITICAL ALERT: Bad batch warning",
+      "notification_body": "Serious reactions reported. Don’t take it. If already taken, get monitor_
+
+cat > braingrid/memory/sample_alerts.json <<'EOF'
+[
+  {
+    "id": "alert_2026_01_14_0001",
+    "created_at": "2026-01-14T10:15:00+10:00",
+    "source": "Community reports",
+    "location_context": "Near Main Stage / crowd-heavy zone",
+    "alert_type": "heat_risk",
+    "substance": "",
+    "severity": "medium",
+    "ui": {
+      "alert_title": "ALERT: Heat risk advisory",
+      "alert_subtitle": "Heat risk advisory reported near Main Stage / crowd-heavy zone",
+      "severity_label": "MEDIUM",
+      "severity_color": "#F1C40F",
+      "severity_icon": "alert_triangle",
+      "risk_summary": "Crowd density and heat can escalate fast into dangerous overheating, even without substances. Act early to cool down.",
+      "do_now_bullets": [
+        "Move to airflow/shade and cool down before you feel cooked",
+        "Sip water regularly and use electrolytes if sweating heavily",
+        "Buddy-check: hot, confused, dizzy, or cramps = take action now"
+      ],
+      "triage_recommendation": "Monitor closely. Seek on-site medical if confusion, fainting, persistent vomiting, or inability to cool down.",
+      "notification_title": "Heat risk: take a cool-down break",
+      "notification_body": "Crowd + heat can turn dangerous quickly. Move to airflow, hydrate, buddy-check."
+    }
+  },
+  {
+    "id": "alert_2026_01_14_0002",
+    "created_at": "2026-01-14T11:05:00+10:00",
+    "source": "Partner service advisory",
+    "location_context": "Across venue",
+    "alert_type": "contamination",
+    "substance": "MDMA",
+    "severity": "high",
+    "ui": {
+      "alert_title": "ALERT: MDMA contamination warning",
+      "alert_subtitle": "Contamination warning reported across venue",
+      "severity_label": "HIGH",
+      "severity_color": "#E67E22",
+      "severity_icon": "warning_octagon",
+      "risk_summary": "Reports suggest unexpected compounds or unusually strong effects linked to this MDMA. Risk of overdose and medical emergency is higher than normal.",
+      "do_now_bullets": [
+        "Avoid mixing with alcohol or other drugs; keep it simple and safer",
+        "Stay with a trusted friend and monitor each other closely",
+        "If anyone becomes unusually drowsy, confused, overheated, or collapses: get medical help early"
+      ],
+      "triage_recommendation": "High risk: seek on-site medical if symptoms appear or worsen. Call emergency for unconsciousness, seizures, chest pain, or breathing trouble.",
+      "notification_title": "HIGH ALERT: MDMA contamination warning",
+      "notification_body": "Unexpected effects reported. Don’t mix, stay with mates, seek medical early if symptoms hit."
+    }
+  },
+  {
+    "id": "alert_2026_01_14_0003",
+    "created_at": "2026-01-14T12:30:00+10:00",
+    "source": "Multiple incident reports",
+    "location_context": "Multiple stages / widespread",
+    "alert_type": "bad_batch",
+    "substance": "Unknown pills",
+    "severity": "critical",
+    "ui": {
+      "alert_title": "ALERT: Critical bad batch warning",
+      "alert_subtitle": "Bad batch warning reported multiple stages / widespread",
+      "severity_label": "CRITICAL",
+      "severity_color": "#E74C3C",
+      "severity_icon": "siren",
+      "risk_summary": "Multiple serious reactions have been linked to this batch. Risk is high even at typical amounts. Treat as urgent.",
+      "do_now_bullets": [
+        "Do not take this batch; warn friends nearby immediately",
+        "If already taken, avoid alcohol/other drugs and stay monitored with a buddy",
+        "Go to medical now if there’s severe agitation, overheating, repeated vomiting, collapse, or confusion"
+      ],
+      "triage_recommendation": "Critical: go to on-site medical immediately. Call emergency for unconsciousness, seizures, chest pain, or breathing issues.",
+      "notification_title": "CRITICAL ALERT: Bad batch warning",
+      "notification_body": "Serious reactions reported. Don’t take it. If already taken, get monitored and go medical early."
+    }
+  }
+]

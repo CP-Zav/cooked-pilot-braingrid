@@ -1,0 +1,150 @@
+{
+  "id": "workflow.panic.stabilize.escalate",
+  "name": "Panic Mode: Stabilize and Escalate",
+  "version": "1.0.0",
+  "inputs": [
+    { "key": "user_state", "type": "string", "description": "anxious, panicking, confused, overheated, unwell, other" },
+    { "key": "symptoms", "type": "array", "description": "symptom keywords", "items": { "type": "string" } },
+    { "key": "severity", "type": "string", "description": "low, medium, high, critical" },
+    { "key": "location_context", "type": "string", "description": "optional venue/stage/area" }
+  ],
+  "steps": [
+    {
+      "id": "severity_mapping",
+      "action": "Map severity to canonical UI semantics using core severity map, icon map, and motion rules",
+      "checks": [
+        "severity in [low, medium, high, critical]"
+      ],
+
+cat > braingrid/core/panic_renderer_contract.md <<'EOF'
+# Cooked Pilot – Panic Mode Renderer Contract (v1)
+
+Panic Mode is a stabilization + escalation UI. It must feel calm, minimal, and directive.
+
+---
+
+## Canonical Pattern (same bones)
+1. WHAT
+2. RISK
+3. DO NOW
+4. GET HELP
+
+---
+
+## Component: Panic Mode Full Screen
+
+### WHAT
+- panic_title
+- panic_subtitle (include location_context if available)
+
+### RISK
+- risk_summary (max 2 sentences)
+
+### DO NOW
+- Render stabilize_steps as a numbered list (max 5 visible steps)
+- Also render do_now_bullets (max 3) as quick actions underneath
+
+### GET HELP
+- R
+
+cat > braingrid/core/panic_renderer_contract.md <<'EOF'
+# Cooked Pilot – Panic Mode Renderer Contract (v1)
+
+Panic Mode is a stabilization + escalation UI. It must feel calm, minimal, and directive.
+
+---
+
+## Canonical Pattern (same bones)
+1. WHAT
+2. RISK
+3. DO NOW
+4. GET HELP
+
+---
+
+## Component: Panic Mode Full Screen
+
+### WHAT
+- panic_title
+- panic_subtitle (include location_context if available)
+
+### RISK
+- risk_summary (max 2 sentences)
+
+### DO NOW
+- Render stabilize_steps as a numbered list (max 5 visible steps)
+- Also render do_now_bullets (max 3) as quick actions underneath
+
+### GET HELP
+- Render triage_recommendation
+- Render get_help_steps (max 3)
+- Always include red-flag line:
+  “If unconscious, seizing, chest pain, or not breathing — call emergency services now.”
+
+---
+
+## Interaction Rules
+- Single-tap big buttons only (no tiny links)
+- No scrolling required to reach GET HELP
+- Respect reduce motion setting (motion_rules.global.reduce_motion_respect = true)
+- Never use shaking/flashing animations
+- Keep language non-judgmental,
+
+git add braingrid/workflows/panic_mode_stabilize_and_escalate.json braingrid/core/panic_renderer_contract.md braingrid/memory/sample_panic_payloads.json
+git commit -m "Add Panic Mode workflow, renderer contract, and sample payloads"
+git push
+
+cat > braingrid/core/panic_buttons_spec.json <<'EOF'
+{
+  "version": "1.0.0",
+  "principles": [
+    "One tap = one action",
+    "No tiny links",
+    "No scrolling required to reach help actions",
+    "Respect reduce motion",
+    "Avoid surveillance language"
+  ],
+  "primary_buttons": [
+    {
+      "id": "btn_find_medical",
+      "label": "Find medical",
+      "icon": "lifebuoy",
+      "action": "open_map_to_nearest_medical_or_first_aid",
+      "visibility_rule": "always"
+    },
+    {
+      "id": "btn_call_emergency",
+      "label": "Call emergency",
+      "icon": "phone_sos",
+      "action": "initiate_phone_call_emergency_number",
+      "visibility_rule": "visible_if_red_flags_detected_or_severity_critical"
+    }
+  ],
+  "secondary_buttons": [
+    {
+      "id": "btn_message_buddy",
+      "label": "Message buddy",
+      "icon": "share",
+      "action": "send_precomposed_message_to_selected_contact",
+      "visibility_rule": "always"
+    },
+    {
+      "id": "btn_show_exit_route",
+      "label": "Show exit route",
+      "icon": "map_pin",
+      "action": "open_map_to_nearest_exit_or_quiet_zone",
+      "visibility_rule": "always"
+    }
+  ],
+  "precomposed_messages": {
+    "buddy_default": "I’m not okay. Can you come to me now and stay with me? I’m at: {location_context}",
+    "medical_default": "Panic Mode: symptoms include {symptoms}. Location: {location_context}. Please assist."
+  },
+  "ui_rules": {
+    "layout": "2 primary buttons visible without scroll; secondary below",
+    "button_size": "large",
+    "max_buttons_total": 4,
+    "no_confirmation_dialog_for": ["btn_call_emergency"],
+    "confirmation_dialog_for": ["btn_message_buddy"]
+  }
+}
