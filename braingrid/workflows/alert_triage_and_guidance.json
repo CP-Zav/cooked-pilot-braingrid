@@ -1,0 +1,126 @@
+{
+  "id": "workflow.alert.triage.guidance",
+  "name": "Alert Triage and Harm Reduction Guidance",
+  "version": "1.1.0",
+  "inputs": [
+    {
+      "key": "alert_type",
+      "type": "string",
+      "description": "Type of alert (bad_batch, contamination, overdose_spike, heat_risk)"
+    },
+    {
+      "key": "substance",
+      "type": "string",
+      "description": "Substance involved, if known"
+    },
+    {
+      "key": "severity",
+      "type": "string",
+      "description": "Severity level: low, medium, high, critical"
+    },
+    {
+      "key": "location_context",
+      "type": "string",
+      "description": "Optional location or festival context"
+    }
+  ],
+  "steps": [
+    {
+      "id": "normalize_inputs",
+      "action": "Normalize alert type, severity, and substance labels for UI display",
+      "checks": [
+        "severity in [low, medium, high, critical]"
+      ],
+      "produces": [
+        "severity_label",
+        "alert_type_label",
+        "display_substance"
+      ]
+    },
+    {
+      "id": "risk_interpretation",
+      "action": "Interpret risk based on alert type, substance, and severity",
+      "checks": [
+        "alert_type is recognized"
+      ],
+      "produces": [
+        "risk_summary"
+      ]
+    },
+    {
+      "id": "guidance_generation",
+      "action": "Generate harm reduction guidance as bullet points",
+      "checks": [
+        "guidance avoids illegal instructions",
+        "guidance avoids dosage as medical advice",
+        "guidance formatted as bullet list"
+      ],
+      "produces": [
+        "do_now_bullets"
+      ]
+    },
+    {
+      "id": "triage_decision",
+      "action": "Decide escalation level and emergency guidance",
+      "checks": [
+        "critical severity triggers emergency escalation"
+      ],
+      "produces": [
+        "triage_recommendation"
+      ]
+    },
+    {
+      "id": "ui_copy_assembly",
+      "action": "Assemble UI and notification copy from prior outputs",
+      "produces": [
+        "alert_title",
+        "alert_subtitle",
+        "notification_title",
+        "notification_body"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "key": "alert_title",
+      "type": "string",
+      "description": "UI title, e.g. ALERT: MDMA"
+    },
+    {
+      "key": "alert_subtitle",
+      "type": "string",
+      "description": "Short context line for alert detail view"
+    },
+    {
+      "key": "severity_label",
+      "type": "string",
+      "description": "LOW / MEDIUM / HIGH / CRITICAL"
+    },
+    {
+      "key": "risk_summary",
+      "type": "string",
+      "description": "Plain-language explanation of the risk"
+    },
+    {
+      "key": "do_now_bullets",
+      "type": "array",
+      "description": "Ordered list of immediate actions",
+      "items": { "type": "string" }
+    },
+    {
+      "key": "triage_recommendation",
+      "type": "string",
+      "description": "Escalation guidance (monitor / medical / emergency)"
+    },
+    {
+      "key": "notification_title",
+      "type": "string",
+      "description": "Push notification title"
+    },
+    {
+      "key": "notification_body",
+      "type": "string",
+      "description": "Push notification body text"
+    }
+  ]
+}
