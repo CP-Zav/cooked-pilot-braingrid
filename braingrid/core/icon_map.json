@@ -1,0 +1,23 @@
+{
+  "severity": {
+    "low": "info",
+    "medium": "alert_triangle",
+    "high": "warning_octagon",
+    "critical": "siren"
+  },
+  "alert_type": {
+    "bad_batch": "flask_bad",
+    "contamination": "biohazard",
+    "overdose_spike": "heartbeat_alert",
+    "heat_risk": "thermometer_hot",
+    "unknown": "radar"
+  },
+  "actions": {
+    "do_now": "checklist",
+    "get_help": "lifebuoy",
+    "call_emergency": "phone_sos",
+    "message_buddy": "share",
+    "find_medical": "map_pin",
+    "exit_route": "exit"
+  }
+}
