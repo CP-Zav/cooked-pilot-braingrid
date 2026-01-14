@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BrainGridWorkflow",
+  "type": "object",
+  "required": ["id", "name", "version", "inputs", "steps", "outputs"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "object", "required": ["key", "type"], "properties": {
+        "key": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" }
+      }}
+    },
+    "steps": {
+      "type": "array",
+      "items": { "type": "object", "required": ["id", "action"], "properties": {
+        "id": { "type": "string" },
+        "action": { "type": "string" },
+        "checks": { "type": "array", "items": { "type": "string" } },
+        "produces": { "type": "array", "items": { "type": "string" } }
+      }}
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "type": "object", "required": ["key", "type"], "properties": {
+        "key": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" }
+      }}
+    }
+  }
+}
